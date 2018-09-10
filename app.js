@@ -120,6 +120,14 @@ app.put('/ideas/:id', (req, res) => {
     });
 });
 
+//Delete form Process
+app.delete('/ideas/:id', (req, res) => {
+    Idea.deleteOne({_id: req.params.id})
+        .then(idea => {
+           res.redirect('/ideas'); 
+        });
+});
+
 app.listen(port, () => {
     console.log('Server started on port ${port}');
 });
