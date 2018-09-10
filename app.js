@@ -1,6 +1,8 @@
 const express = require("express");
 const exphbs = require("express-handlebars");
+const session = require("express-session");
 const methodOverride = require("method-override");
+const flash = require("connect-flash");
 const bodyParser = require("body-parser");
 const mongoose = require("mongoose");
 
@@ -26,6 +28,24 @@ const port = process.env.PORT;
 //Method override Middleware
 //override with POST having ? method-DELETE
 app.use(methodOverride('_method'));
+
+//Express session Middleware
+app.use(session({
+    secret: 'secret dog',
+    resave: true,
+    saveUninitialized: true
+}));
+
+//flash Middleware
+app.use(flash());
+
+//Global variables Middleware for messages
+app.use(function(req, res, next) {
+    res.locals.success_msg = req.flash('success_msg');
+    res.locals.error_msg = req.flash('error_msg');
+    res.locals.error = req.flash('error');
+    next();
+});
 
 //BodyParser Middleware
 app.use(bodyParser.urlencoded({extended: false}));
@@ -100,6 +120,7 @@ app.post('/ideas', (req, res) => {
        new Idea(newUser)
         .save()
         .then(idea => {
+            req.flash('success_msg', 'Video idea successfully added');
             res.redirect('/ideas');
         });
    }
@@ -115,6 +136,7 @@ app.put('/ideas/:id', (req, res) => {
         idea.details = req.body.details;
         idea.save()
             .then(idea => {
+                req.flash('success_msg', 'Idea successfully edited');
                 res.redirect('/ideas');
             });
     });
@@ -124,7 +146,8 @@ app.put('/ideas/:id', (req, res) => {
 app.delete('/ideas/:id', (req, res) => {
     Idea.deleteOne({_id: req.params.id})
         .then(idea => {
-           res.redirect('/ideas'); 
+            req.flash('success_msg', 'Video idea successfully removed');
+            res.redirect('/ideas'); 
         });
 });
 
