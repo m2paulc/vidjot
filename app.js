@@ -6,6 +6,7 @@ const methodOverride = require("method-override");
 const flash = require("connect-flash");
 const bodyParser = require("body-parser");
 const mongoose = require("mongoose");
+const passport = require("passport");
 
 const app = express();
 
@@ -21,6 +22,9 @@ const ideas = require("./routes/ideas");
 
 //Load Users Routes
 const users = require("./routes/users");
+
+//Load passport config
+require("./config/passport")(passport);
 
 //Handlebars Middleware
 app.engine('handlebars', exphbs({defaultLayout: 'main'}));
@@ -39,6 +43,11 @@ app.use(session({
     saveUninitialized: true
 }));
 
+//it is important that this goes after Express session Middleware
+//Passport Initialize and Session Middleware
+app.use(passport.initialize());
+app.use(passport.session());
+
 //flash Middleware
 app.use(flash());
 
@@ -47,6 +56,7 @@ app.use(function(req, res, next) {
     res.locals.success_msg = req.flash('success_msg');
     res.locals.error_msg = req.flash('error_msg');
     res.locals.error = req.flash('error');
+    res.locals.user = req.user || null;
     next();
 });
 
