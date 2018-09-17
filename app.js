@@ -10,10 +10,13 @@ const passport = require("passport");
 
 const app = express();
 
+//Load DB config
+const db = require('./config/database');
+
 //Map global promise for Mongoose - fix warning
 mongoose.Promise = global.Promise;
 //Connect to Mongoose
-mongoose.connect('mongodb://localhost/vidjot-dev', {useNewUrlParser: true})
+mongoose.connect(db.mongoURI, {useNewUrlParser: true})
 .then(() => console.log('Mongo DB connected'))
 .catch(err => console.log(err));
 
